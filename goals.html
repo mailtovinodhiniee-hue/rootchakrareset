@@ -254,20 +254,54 @@
 </div>
 
 <script>
-  const scores = { career: 0, health: 0, hustle: 0, brownie: 0 };
-  const saved = JSON.parse(localStorage.getItem('goals') || '{}');
-  document.querySelectorAll('.goal-row').forEach((r, i) => {
-    if (saved[i]) { r.classList.add('done'); const p = parseInt(r.dataset.pts); const c = r.onclick.toString().match(/'(\w+)'\)/)[1]; scores[c] += p; }
-  });
-  updateAll();
 
-  function toggleGoal(el, pts, cat) {
+  const BIN_ID = '6a37d791da38895dfee6a964';
+  const API_KEY = '$2a$10$FcI3ZoXbHdBwWnWYt8WkzekEyGcwr6.b51LvpGGarfP9Wvq2R4uoq';
+  const BASE_URL = 'https://api.jsonbin.io/v3/b';
+  async function cloudGet() {
+    try {
+      const res = await fetch(`${BASE_URL}/${BIN_ID}/latest`, { headers: { 'X-Access-Key': API_KEY } });
+      const data = await res.json();
+      const dot = document.getElementById('sync-dot');
+      const txt = document.getElementById('sync-text');
+      if(dot) dot.style.background = '#5dcaa5';
+      if(txt) txt.textContent = 'Synced';
+      return data.record || {};
+    } catch(e) { return {}; }
+  }
+  async function cloudPut(record) {
+    try {
+      await fetch(`${BASE_URL}/${BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Access-Key': API_KEY }, body: JSON.stringify(record) });
+    } catch(e) { console.log('Sync failed'); }
+  }
+
+  const scores = { career: 0, health: 0, hustle: 0, brownie: 0 };
+
+  async function loadGoals() {
+    const record = await cloudGet();
+    const saved = record['goals'] || JSON.parse(localStorage.getItem('goals') || '{}');
+    document.querySelectorAll('.goal-row').forEach((r, i) => {
+      if (saved[i]) {
+        r.classList.add('done');
+        const p = parseInt(r.dataset.pts);
+        const c = r.onclick.toString().match(/'(\w+)'\)/)[1];
+        scores[c] += p;
+      }
+    });
+    updateAll();
+  }
+  loadGoals();
+
+  async function toggleGoal(el, pts, cat) {
     el.classList.toggle('done');
     scores[cat] += el.classList.contains('done') ? pts : -pts;
     const state = {};
     document.querySelectorAll('.goal-row').forEach((r, i) => { if (r.classList.contains('done')) state[i] = true; });
     localStorage.setItem('goals', JSON.stringify(state));
     updateAll();
+    const record = await cloudGet();
+    record['goals'] = state;
+    await cloudPut(record);
   }
 
   function updateAll() {

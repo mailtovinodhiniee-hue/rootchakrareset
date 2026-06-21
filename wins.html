@@ -165,22 +165,55 @@
   let selectedCat = 'career';
   function selectCat(btn, cat) { document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedCat = cat; }
 
-  function addWin() {
+
+  const BIN_ID = '6a37d791da38895dfee6a964';
+  const API_KEY = '$2a$10$FcI3ZoXbHdBwWnWYt8WkzekEyGcwr6.b51LvpGGarfP9Wvq2R4uoq';
+  const BASE_URL = 'https://api.jsonbin.io/v3/b';
+  async function cloudGet() {
+    try {
+      const res = await fetch(`${BASE_URL}/${BIN_ID}/latest`, { headers: { 'X-Access-Key': API_KEY } });
+      const data = await res.json();
+      const dot = document.getElementById('sync-dot');
+      const txt = document.getElementById('sync-text');
+      if(dot) dot.style.background = '#5dcaa5';
+      if(txt) txt.textContent = 'Synced';
+      return data.record || {};
+    } catch(e) { return {}; }
+  }
+  async function cloudPut(record) {
+    try {
+      await fetch(`${BASE_URL}/${BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Access-Key': API_KEY }, body: JSON.stringify(record) });
+    } catch(e) { console.log('Sync failed'); }
+  }
+
+  async function addWin() {
     const text = document.getElementById('win-text').value.trim();
     if (!text) { alert('Write your win first!'); return; }
-    const wins = JSON.parse(localStorage.getItem('wins') || '[]');
+    const record = await cloudGet();
+    const wins = record['wins'] || JSON.parse(localStorage.getItem('wins') || '[]');
     const response = responses[selectedCat][Math.floor(Math.random() * responses[selectedCat].length)];
     const now = new Date();
     wins.unshift({ text, cat: selectedCat, date: now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }), day: dayNum, response, time: now.getTime() });
     localStorage.setItem('wins', JSON.stringify(wins));
+    record['wins'] = wins;
+    await cloudPut(record);
     document.getElementById('win-text').value = '';
     renderWins();
   }
 
-  function deleteWin(idx) { const wins = JSON.parse(localStorage.getItem('wins') || '[]'); wins.splice(idx, 1); localStorage.setItem('wins', JSON.stringify(wins)); renderWins(); }
+  async function deleteWin(idx) {
+    const record = await cloudGet();
+    const wins = record['wins'] || JSON.parse(localStorage.getItem('wins') || '[]');
+    wins.splice(idx, 1);
+    localStorage.setItem('wins', JSON.stringify(wins));
+    record['wins'] = wins;
+    await cloudPut(record);
+    renderWins();
+  }
 
-  function renderWins() {
-    const wins = JSON.parse(localStorage.getItem('wins') || '[]');
+  async function renderWins() {
+    const record = await cloudGet();
+    const wins = record['wins'] || JSON.parse(localStorage.getItem('wins') || '[]');
     const list = document.getElementById('wins-list');
     const empty = document.getElementById('empty-state');
     const todayWins = wins.filter(w => w.day === dayNum);

@@ -170,7 +170,28 @@
     document.getElementById('free-notes').value = todaySaved.freeNotes || '';
   }
 
-  function saveEntry() {
+
+  const BIN_ID = '6a37d791da38895dfee6a964';
+  const API_KEY = '$2a$10$FcI3ZoXbHdBwWnWYt8WkzekEyGcwr6.b51LvpGGarfP9Wvq2R4uoq';
+  const BASE_URL = 'https://api.jsonbin.io/v3/b';
+  async function cloudGet() {
+    try {
+      const res = await fetch(`${BASE_URL}/${BIN_ID}/latest`, { headers: { 'X-Access-Key': API_KEY } });
+      const data = await res.json();
+      const dot = document.getElementById('sync-dot');
+      const txt = document.getElementById('sync-text');
+      if(dot) dot.style.background = '#5dcaa5';
+      if(txt) txt.textContent = 'Synced';
+      return data.record || {};
+    } catch(e) { return {}; }
+  }
+  async function cloudPut(record) {
+    try {
+      await fetch(`${BASE_URL}/${BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Access-Key': API_KEY }, body: JSON.stringify(record) });
+    } catch(e) { console.log('Sync failed'); }
+  }
+
+  async function saveEntry() {
     const entry = {
       day: dayNum, mood: selectedMood,
       gratitude: document.getElementById('gratitude').value,
@@ -188,6 +209,10 @@
     localStorage.setItem('journal_days', JSON.stringify(allDays));
     document.getElementById('save-confirm').style.display = 'block';
     setTimeout(() => document.getElementById('save-confirm').style.display = 'none', 3000);
+    const record = await cloudGet();
+    record['journal_entry_' + dayNum] = entry;
+    record['journal_days'] = allDays;
+    await cloudPut(record);
     renderTracker(); renderEntries();
   }
 
@@ -236,11 +261,15 @@
     });
   }
 
-  function deleteEntry(day) {
+  async function deleteEntry(day) {
     if (!confirm('Delete Day ' + day + ' entry?')) return;
     localStorage.removeItem('journal_entry_' + day);
     const allDays = JSON.parse(localStorage.getItem('journal_days') || '[]').filter(d => d !== day);
     localStorage.setItem('journal_days', JSON.stringify(allDays));
+    const record = await cloudGet();
+    delete record['journal_entry_' + day];
+    record['journal_days'] = allDays;
+    await cloudPut(record);
     renderTracker(); renderEntries();
   }
 

@@ -69,6 +69,11 @@
     <div class="day-badge" id="day-badge">Day 1 of 48</div>
   </div>
 
+  
+  <div class="sync-bar" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 16px;background:rgba(212,175,55,0.06);border-bottom:1px solid rgba(139,58,82,0.3);">
+    <div class="sync-dot" id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#8b6a7a;"></div>
+    <span id="sync-text" style="font-size:11px;color:#8b6a7a;">Connecting...</span>
+  </div>
   <div class="progress-bar-wrap">
     <div class="progress-top">
       <span class="progress-label">Today's completion</span>
@@ -290,8 +295,6 @@
   document.getElementById('day-badge').textContent = 'Day ' + dayNum + ' of 48';
 
   const rows = document.querySelectorAll('.check-row');
-  const saved = JSON.parse(localStorage.getItem('daily_' + dayNum) || '[]');
-  rows.forEach((r, i) => { if (saved[i]) r.classList.add('checked'); });
   updateProgress();
 
   function toggle(el) {

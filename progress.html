@@ -136,22 +136,56 @@
 
   const weightData = JSON.parse(localStorage.getItem('weight_log') || '{}');
 
-  function logWeight() {
+
+  const BIN_ID = '6a37d791da38895dfee6a964';
+  const API_KEY = '$2a$10$FcI3ZoXbHdBwWnWYt8WkzekEyGcwr6.b51LvpGGarfP9Wvq2R4uoq';
+  const BASE_URL = 'https://api.jsonbin.io/v3/b';
+  async function cloudGet() {
+    try {
+      const res = await fetch(`${BASE_URL}/${BIN_ID}/latest`, { headers: { 'X-Access-Key': API_KEY } });
+      const data = await res.json();
+      const dot = document.getElementById('sync-dot');
+      const txt = document.getElementById('sync-text');
+      if(dot) dot.style.background = '#5dcaa5';
+      if(txt) txt.textContent = 'Synced';
+      return data.record || {};
+    } catch(e) { return {}; }
+  }
+  async function cloudPut(record) {
+    try {
+      await fetch(`${BASE_URL}/${BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Access-Key': API_KEY }, body: JSON.stringify(record) });
+    } catch(e) { console.log('Sync failed'); }
+  }
+
+  async function logWeight() {
     const w = parseFloat(document.getElementById('weight-log').value);
     if (!w || w < 60 || w > 100) { alert('Please enter a valid weight between 60 and 100 kg'); return; }
     weightData[dayNum] = w;
     localStorage.setItem('weight_log', JSON.stringify(weightData));
     document.getElementById('current-weight').textContent = w.toFixed(1);
-    const lost = Math.max(0, 94 - w).toFixed(1);
-    document.getElementById('kg-lost').textContent = lost;
+    document.getElementById('kg-lost').textContent = Math.max(0, 94 - w).toFixed(1);
     updateChart();
+    const record = await cloudGet();
+    record['weight_log'] = weightData;
+    await cloudPut(record);
   }
 
-  const latestWeight = weightData[Math.max(...Object.keys(weightData).map(Number), 0)];
-  if (latestWeight) {
-    document.getElementById('current-weight').textContent = latestWeight.toFixed(1);
-    document.getElementById('kg-lost').textContent = Math.max(0, 94 - latestWeight).toFixed(1);
+  async function loadWeightCloud() {
+    const record = await cloudGet();
+    if (record['weight_log']) {
+      Object.assign(weightData, record['weight_log']);
+      localStorage.setItem('weight_log', JSON.stringify(weightData));
+      const latest = weightData[Math.max(...Object.keys(weightData).map(Number))];
+      if (latest) {
+        document.getElementById('current-weight').textContent = latest.toFixed(1);
+        document.getElementById('kg-lost').textContent = Math.max(0, 94 - latest).toFixed(1);
+      }
+      updateChart();
+    }
   }
+  loadWeightCloud();
+
+
 
   function updateChart() {
     const labels = Array.from({length: 48}, (_, i) => 'D' + (i+1));
