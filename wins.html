@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Wins — Root Chakra Reset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a0a0f; font-family: 'Lato', sans-serif; color: #f5e6d0; min-height: 100vh; }
+  .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+  .header { background: linear-gradient(160deg, #2d0a14 0%, #4a1020 50%, #2d0a14 100%); padding: 28px 24px 20px; text-align: center; border-bottom: 1px solid #8b3a52; }
+  .header-icon { font-size: 28px; margin-bottom: 6px; display: block; }
+  .header-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600; color: #f5e6d0; }
+  .header-sub { font-size: 12px; color: #c4a882; margin-top: 4px; }
+  .day-badge { display: inline-block; background: rgba(212,175,55,0.2); border: 1px solid #d4af37; color: #d4af37; font-size: 12px; padding: 4px 16px; border-radius: 20px; margin-top: 8px; }
+
+  .appreciation-card { margin: 16px; background: linear-gradient(135deg, #2d1a0a, #3d2010); border: 1px solid #d4af37; border-radius: 16px; padding: 18px 20px; text-align: center; }
+  .appreciation-title { font-family: 'Cinzel', serif; font-size: 11px; color: #d4af37; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .appreciation-text { font-size: 15px; color: #f5e6d0; font-style: italic; line-height: 1.7; }
+  .appreciation-sign { font-size: 11px; color: #d4af37; margin-top: 8px; }
+  .next-btn { background: none; border: 1px solid #8b3a52; color: #d4af37; font-size: 11px; padding: 5px 14px; border-radius: 12px; cursor: pointer; margin-top: 12px; font-family: 'Lato', sans-serif; }
+  .next-btn:hover { background: rgba(212,175,55,0.1); }
+
+  .section-title { font-family: 'Cinzel', serif; font-size: 10px; color: #d4af37; letter-spacing: 2px; text-transform: uppercase; padding: 0 16px; margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, #8b3a52, transparent); }
+
+  .win-input-wrap { margin: 0 16px 16px; background: #2d0a14; border: 1px solid #6b2a3a; border-radius: 14px; padding: 16px; }
+  .win-input-label { font-size: 12px; color: #c4a882; margin-bottom: 8px; display: block; }
+  .win-textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid #8b3a52; border-radius: 10px; color: #f5e6d0; font-size: 13px; font-family: 'Lato', sans-serif; padding: 10px 12px; resize: none; min-height: 80px; line-height: 1.5; }
+  .win-textarea:focus { outline: none; border-color: #d4af37; }
+  .win-category { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+  .cat-btn { background: none; border: 1px solid #6b2a3a; color: #c4a882; font-size: 11px; padding: 5px 10px; border-radius: 10px; cursor: pointer; font-family: 'Lato', sans-serif; transition: all 0.2s; }
+  .cat-btn.selected { background: rgba(212,175,55,0.15); border-color: #d4af37; color: #d4af37; }
+  .add-win-btn { width: 100%; background: linear-gradient(to right, #8b3a52, #d4af37); border: none; color: #1a0a0f; font-size: 13px; font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 8px; }
+  .add-win-btn:hover { opacity: 0.9; }
+
+  .wins-list { margin: 0 16px; }
+  .win-card { background: #2d0a14; border: 1px solid #6b2a3a; border-radius: 12px; padding: 14px; margin-bottom: 10px; position: relative; }
+  .win-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .win-card-cat { font-size: 10px; padding: 3px 8px; border-radius: 8px; font-weight: 700; }
+  .cat-career { background: rgba(122,184,245,0.15); color: #7ab8f5; }
+  .cat-health { background: rgba(240,120,120,0.15); color: #f07878; }
+  .cat-hustle { background: rgba(171,167,232,0.15); color: #aba7e8; }
+  .cat-sadhana { background: rgba(212,175,55,0.15); color: #d4af37; }
+  .cat-personal { background: rgba(93,202,165,0.15); color: #5dcaa5; }
+  .win-card-date { font-size: 10px; color: #8b6a7a; }
+  .win-card-text { font-size: 13px; color: #f5e6d0; line-height: 1.5; }
+  .win-card-response { font-size: 12px; color: #d4af37; font-style: italic; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(107,42,58,0.4); }
+  .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #6b2a3a; cursor: pointer; font-size: 16px; }
+  .delete-btn:hover { color: #f07878; }
+
+  .empty-state { text-align: center; padding: 32px 16px; color: #8b6a7a; }
+  .empty-icon { font-size: 32px; margin-bottom: 8px; display: block; }
+  .empty-text { font-size: 13px; line-height: 1.6; }
+
+  .streak-banner { margin: 0 16px 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .streak-card { background: #2d0a14; border: 1px solid #6b2a3a; border-radius: 12px; padding: 12px; text-align: center; }
+  .streak-val { font-family: 'Cinzel', serif; font-size: 20px; color: #d4af37; }
+  .streak-lbl { font-size: 10px; color: #8b6a7a; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 10px 0 14px; background: #2d0a14; border-top: 1px solid #6b2a3a; z-index: 100; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 10px; border-radius: 10px; text-decoration: none; }
+  .nav-item.active { background: rgba(212,175,55,0.12); }
+  .nav-icon { font-size: 18px; }
+  .nav-lbl { font-size: 9px; color: #6b2a3a; letter-spacing: 0.5px; text-transform: uppercase; }
+  .nav-item.active .nav-lbl { color: #d4af37; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <span class="header-icon">⭐</span>
+    <div class="header-title">Daily Wins</div>
+    <div class="header-sub">You showed up. You deserve to be celebrated.</div>
+    <div class="day-badge" id="day-badge">Day 1 of 48</div>
+  </div>
+
+  <div class="appreciation-card">
+    <div class="appreciation-title">✦ A message for you ✦</div>
+    <div class="appreciation-text" id="appreciation-text">You woke up today and chose to keep going. That is not small. That is everything.</div>
+    <div class="appreciation-sign" id="appreciation-sign">— Your chart, your sadhana, your soul</div>
+    <button class="next-btn" onclick="nextAppreciation()">next message ✦</button>
+  </div>
+
+  <div class="section-title">📊 Win streaks</div>
+  <div class="streak-banner">
+    <div class="streak-card">
+      <div class="streak-val" id="total-wins">0</div>
+      <div class="streak-lbl">Total wins</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-val" id="today-wins">0</div>
+      <div class="streak-lbl">Today</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-val" id="this-week">0</div>
+      <div class="streak-lbl">This week</div>
+    </div>
+  </div>
+
+  <div class="section-title">✍️ Log a win</div>
+  <div class="win-input-wrap">
+    <label class="win-input-label">What did you win today, Vinodhiniee?</label>
+    <textarea class="win-textarea" id="win-text" placeholder="I wrote 600 words today and it felt easy...&#10;I went to gym even though I didn't feel like it...&#10;I slept by 10:45 PM three nights in a row..."></textarea>
+    <div class="win-category">
+      <button class="cat-btn selected" onclick="selectCat(this,'career')">💼 Career</button>
+      <button class="cat-btn" onclick="selectCat(this,'health')">🌸 Health</button>
+      <button class="cat-btn" onclick="selectCat(this,'hustle')">📚 Side hustle</button>
+      <button class="cat-btn" onclick="selectCat(this,'sadhana')">🔱 Sadhana</button>
+      <button class="cat-btn" onclick="selectCat(this,'personal')">💛 Personal</button>
+    </div>
+    <button class="add-win-btn" onclick="addWin()">✦ Add this win</button>
+  </div>
+
+  <div class="section-title">🏆 All wins</div>
+  <div class="wins-list" id="wins-list">
+    <div class="empty-state" id="empty-state">
+      <span class="empty-icon">🌱</span>
+      <div class="empty-text">No wins logged yet today.<br>Every small step counts — log your first win!</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-lbl">Home</span></a>
+    <a href="daily.html" class="nav-item"><span class="nav-icon">✅</span><span class="nav-lbl">Daily</span></a>
+    <a href="goals.html" class="nav-item"><span class="nav-icon">🏆</span><span class="nav-lbl">Goals</span></a>
+    <a href="wins.html" class="nav-item active"><span class="nav-icon">⭐</span><span class="nav-lbl">Wins</span></a>
+    <a href="progress.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-lbl">Progress</span></a>
+  </div>
+</div>
+
+<script>
+  const start = new Date('2026-07-01'); const today = new Date(); today.setHours(0,0,0,0); start.setHours(0,0,0,0);
+  const dayNum = Math.max(1, Math.min(48, Math.floor((today - start) / 86400000) + 1));
+  document.getElementById('day-badge').textContent = 'Day ' + dayNum + ' of 48';
+
+  const appreciations = [
+    { text: 'You woke up today and chose to keep going. That is not small. That is everything.', sign: '— Your chart, your sadhana, your soul' },
+    { text: 'Scorpio Lagna does not quit. You have survived things that would have broken others. Today you showed up again.', sign: '— The Phoenix in you' },
+    { text: 'Every word you write is a permanent wealth asset. Every rep at the gym is Mars energy channelled. Every mantra is Moon restored.', sign: '— Your planets are proud' },
+    { text: 'Baby girl — you are building something extraordinary. One day at a time. One habit at a time.', sign: '— Future Vinodhiniee' },
+    { text: 'Rohini Moon does not rush. She grows. She blooms. She overflows with abundance when she is ready. You are getting ready.', sign: '— Nakshatra wisdom' },
+    { text: 'The crores are not a fantasy. They are a mathematical consequence of what you are building right now, today.', sign: '— Mars + Rahu in 11th' },
+    { text: 'You are not who you were on July 1st. Notice that. Honour that.', sign: '— Saturn sees your growth' },
+    { text: 'Every time you choose the gym over the couch, the book over the scroll, the sleep over the phone — you are choosing your future self.', sign: '— Your dharma speaks' },
+    { text: 'The woman you are becoming is watching. She is so proud of you for not giving up.', sign: '— August 17th, 2026' },
+    { text: 'Sun + Jupiter in your 3rd house. You were literally born to teach, write, and inspire. Every win today is that destiny unfolding.', sign: '— Your chart never lies' },
+    { text: 'Vino — you made a live app from scratch today. If you can do that, you can do anything.', sign: '— June 21, 2026' },
+    { text: 'Your voice is your wealth. Your discipline is your freedom. Your showing up is your prayer.', sign: '— 48-day Mandala Sadhana' },
+  ];
+
+  let appIdx = 0;
+  function nextAppreciation() { appIdx = (appIdx + 1) % appreciations.length; document.getElementById('appreciation-text').textContent = appreciations[appIdx].text; document.getElementById('appreciation-sign').textContent = appreciations[appIdx].sign; }
+
+  const responses = {
+    career: ['Career win logged! Leo in 10th is shining. Keep showing up like this.', 'That is your Sun + Jupiter in 3rd house speaking. Your professional light is growing.', 'Career win noted! Mars as your Lagna lord in 11th approves of this ambition.'],
+    health: ['Health win! Your body is your first home and you are tending to it beautifully.', 'Every healthy choice is Kapha reducing and Mars energy rising. Well done!', 'Weight loss, gym, steps — your physical transformation is real and happening.'],
+    hustle: ['Publishing win! Mercury + Venus in 2nd is activated. The crores are being built word by word.', 'Side hustle progress logged! Every page written is a permanent passive income asset.', 'Saturn sees your creative discipline. The catalog is building. Keep going.'],
+    sadhana: ['Sadhana win! LAM mantra, gratitude, affirmations — your root chakra thanks you.', 'Spiritual practice logged. OM NAMAH SHIVAYA. Scorpio Lagna is grounded and protected.', 'Rohini Moon nourished. Moon in Taurus restored. Your most powerful planet is grateful.'],
+    personal: ['Personal growth win! The woman you are becoming is taking shape every single day.', 'Self-love in action. Moon in 7th healing one conscious choice at a time.', 'Personal win logged! Every act of self-compassion heals the karmic wound.'],
+  };
+
+  let selectedCat = 'career';
+  function selectCat(btn, cat) { document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedCat = cat; }
+
+  function addWin() {
+    const text = document.getElementById('win-text').value.trim();
+    if (!text) { alert('Write your win first!'); return; }
+    const wins = JSON.parse(localStorage.getItem('wins') || '[]');
+    const response = responses[selectedCat][Math.floor(Math.random() * responses[selectedCat].length)];
+    const now = new Date();
+    wins.unshift({ text, cat: selectedCat, date: now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }), day: dayNum, response, time: now.getTime() });
+    localStorage.setItem('wins', JSON.stringify(wins));
+    document.getElementById('win-text').value = '';
+    renderWins();
+  }
+
+  function deleteWin(idx) { const wins = JSON.parse(localStorage.getItem('wins') || '[]'); wins.splice(idx, 1); localStorage.setItem('wins', JSON.stringify(wins)); renderWins(); }
+
+  function renderWins() {
+    const wins = JSON.parse(localStorage.getItem('wins') || '[]');
+    const list = document.getElementById('wins-list');
+    const empty = document.getElementById('empty-state');
+    const todayWins = wins.filter(w => w.day === dayNum);
+    const weekWins = wins.filter(w => w.day >= dayNum - 7);
+    document.getElementById('total-wins').textContent = wins.length;
+    document.getElementById('today-wins').textContent = todayWins.length;
+    document.getElementById('this-week').textContent = weekWins.length;
+    if (wins.length === 0) { empty.style.display = 'block'; list.innerHTML = ''; list.appendChild(empty); return; }
+    empty.style.display = 'none';
+    list.innerHTML = '';
+    wins.forEach((w, i) => {
+      const card = document.createElement('div'); card.className = 'win-card';
+      card.innerHTML = '<div class="win-card-top"><span class="win-card-cat cat-' + w.cat + '">' + {career:'💼 Career',health:'🌸 Health',hustle:'📚 Side Hustle',sadhana:'🔱 Sadhana',personal:'💛 Personal'}[w.cat] + '</span><span class="win-card-date">Day ' + w.day + ' — ' + w.date + '</span></div><div class="win-card-text">' + w.text + '</div><div class="win-card-response">' + w.response + '</div><button class="delete-btn" onclick="deleteWin(' + i + ')">×</button>';
+      list.appendChild(card);
+    });
+  }
+
+  renderWins();
+  appIdx = Math.floor(Math.random() * appreciations.length);
+  nextAppreciation(); appIdx--;
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goals Scoreboard — Root Chakra Reset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a0a0f; font-family: 'Lato', sans-serif; color: #f5e6d0; min-height: 100vh; }
+  .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+  .header { background: linear-gradient(160deg, #2d0a14 0%, #4a1020 50%, #2d0a14 100%); padding: 28px 24px 20px; text-align: center; border-bottom: 1px solid #8b3a52; }
+  .header-icon { font-size: 28px; margin-bottom: 6px; display: block; }
+  .header-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600; color: #f5e6d0; }
+  .header-sub { font-size: 12px; color: #c4a882; margin-top: 4px; }
+
+  .score-banner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px; }
+  .score-card { background: #2d0a14; border: 1px solid #6b2a3a; border-radius: 12px; padding: 12px; text-align: center; }
+  .score-card .lbl { font-size: 10px; color: #8b6a7a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .score-card .val { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 600; color: #f5e6d0; }
+  .score-card .sub { font-size: 10px; color: #8b6a7a; margin-top: 2px; }
+
+  .section-title { font-family: 'Cinzel', serif; font-size: 10px; color: #d4af37; letter-spacing: 2px; text-transform: uppercase; padding: 0 16px; margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, #8b3a52, transparent); }
+
+  .pillar { margin: 0 16px 16px; border: 1px solid #6b2a3a; border-radius: 14px; overflow: hidden; }
+  .pillar-header { padding: 12px 16px; background: linear-gradient(to right, #2d0a14, #3d1020); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #6b2a3a; }
+  .pillar-title { font-family: 'Cinzel', serif; font-size: 13px; color: #f5e6d0; }
+  .pillar-pts { font-size: 12px; color: #d4af37; }
+
+  .goal-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; border-bottom: 1px solid rgba(107,42,58,0.3); cursor: pointer; transition: background 0.2s; }
+  .goal-row:last-child { border-bottom: none; }
+  .goal-row:hover { background: rgba(212,175,55,0.04); }
+  .goal-row.done { background: rgba(212,175,55,0.06); }
+  .goal-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #6b2a3a; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.2s; }
+  .goal-row.done .goal-check { background: #d4af37; border-color: #d4af37; }
+  .goal-checkmark { display: none; color: #1a0a0f; font-size: 11px; font-weight: 700; }
+  .goal-row.done .goal-checkmark { display: block; }
+  .goal-info { flex: 1; }
+  .goal-name { font-size: 13px; color: #f5e6d0; line-height: 1.4; }
+  .goal-row.done .goal-name { color: #8b6a7a; text-decoration: line-through; }
+  .goal-target { font-size: 11px; color: #8b6a7a; margin-top: 2px; }
+  .goal-pts { font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .pts-solid { color: #5dcaa5; }
+  .pts-stretch { color: #ef9f27; }
+  .pts-brownie { color: #ed93b1; }
+
+  .badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: 700; margin-left: 4px; vertical-align: middle; }
+  .badge-solid { background: rgba(93,202,165,0.15); color: #5dcaa5; }
+  .badge-stretch { background: rgba(239,159,39,0.15); color: #ef9f27; }
+  .badge-brownie { background: rgba(237,147,177,0.15); color: #ed93b1; }
+
+  .sub-label { font-size: 10px; color: #8b6a7a; padding: 6px 14px 2px; background: rgba(107,42,58,0.2); border-bottom: 1px solid rgba(107,42,58,0.3); letter-spacing: 1px; text-transform: uppercase; }
+
+  .total-banner { margin: 0 16px 16px; background: linear-gradient(135deg, #2d0a14, #4a1020); border: 1px solid #d4af37; border-radius: 14px; padding: 16px; text-align: center; }
+  .total-num { font-family: 'Cinzel', serif; font-size: 32px; font-weight: 600; color: #f5e6d0; }
+  .total-lbl { font-size: 12px; color: #c4a882; margin-top: 4px; }
+  .total-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 12px; overflow: hidden; }
+  .total-bar-fill { height: 100%; background: linear-gradient(to right, #8b3a52, #d4af37); border-radius: 3px; transition: width 0.6s ease; }
+  .level-text { font-family: 'Cinzel', serif; font-size: 14px; color: #d4af37; margin-top: 10px; }
+
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 10px 0 14px; background: #2d0a14; border-top: 1px solid #6b2a3a; z-index: 100; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 10px; border-radius: 10px; text-decoration: none; }
+  .nav-item.active { background: rgba(212,175,55,0.12); }
+  .nav-icon { font-size: 18px; }
+  .nav-lbl { font-size: 9px; color: #6b2a3a; letter-spacing: 0.5px; text-transform: uppercase; }
+  .nav-item.active .nav-lbl { color: #d4af37; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <span class="header-icon">🏆</span>
+    <div class="header-title">Goals Scoreboard</div>
+    <div class="header-sub">July 1 — August 17, 2026</div>
+  </div>
+
+  <div class="score-banner">
+    <div class="score-card">
+      <div class="lbl">Total score</div>
+      <div class="val" id="total-score">0</div>
+      <div class="sub">of 1000 pts</div>
+    </div>
+    <div class="score-card">
+      <div class="lbl">Goals done</div>
+      <div class="val" id="goals-done">0</div>
+      <div class="sub">of 20</div>
+    </div>
+    <div class="score-card">
+      <div class="lbl">Bonus pts</div>
+      <div class="val" id="bonus-pts" style="color:#ed93b1;">0</div>
+      <div class="sub">brownie</div>
+    </div>
+  </div>
+
+  <!-- CAREER -->
+  <div class="section-title">💼 Career — 350 pts</div>
+  <div class="pillar">
+    <div class="pillar-header">
+      <span class="pillar-title">Pillar 1 — Career</span>
+      <span class="pillar-pts" id="career-pts">0 / 350</span>
+    </div>
+    <div class="sub-label">Solid goals</div>
+    <div class="goal-row" onclick="toggleGoal(this,100,'career')" data-pts="100">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Compering nailed on August 3rd <span class="badge badge-solid">Solid</span></div><div class="goal-target">Prepare 3x/week from July 15 — walk off stage proud</div></div>
+      <div class="goal-pts pts-solid">+100</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,80,'career')" data-pts="80">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">One high-quality work deliverable <span class="badge badge-solid">Solid</span></div><div class="goal-target">SQL / SOP / SKILL.md — manager acknowledges quality</div></div>
+      <div class="goal-pts pts-solid">+80</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,70,'career')" data-pts="70">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Zero late logins or missed commitments <span class="badge badge-solid">Solid</span></div><div class="goal-target">48 days of clean, reliable professional presence</div></div>
+      <div class="goal-pts pts-solid">+70</div>
+    </div>
+    <div class="sub-label">Stretch goals</div>
+    <div class="goal-row" onclick="toggleGoal(this,60,'career')" data-pts="60">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Build one strong internal relationship <span class="badge badge-stretch">Stretch</span></div><div class="goal-target">Genuine connection with one senior or key stakeholder</div></div>
+      <div class="goal-pts pts-stretch">+60</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,40,'career')" data-pts="40">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Visible AI skill demonstrated to team <span class="badge badge-stretch">Stretch</span></div><div class="goal-target">One AI-assisted output acknowledged by team</div></div>
+      <div class="goal-pts pts-stretch">+40</div>
+    </div>
+  </div>
+
+  <!-- HEALTH -->
+  <div class="section-title">🌸 Health — 400 pts</div>
+  <div class="pillar">
+    <div class="pillar-header">
+      <span class="pillar-title">Pillar 2 — Health</span>
+      <span class="pillar-pts" id="health-pts">0 / 400</span>
+    </div>
+    <div class="sub-label">Solid goals</div>
+    <div class="goal-row" onclick="toggleGoal(this,80,'health')" data-pts="80">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Weight: 94 kg → 89 kg <span class="badge badge-solid">Solid</span></div><div class="goal-target">-5 kg by Aug 17 — weigh in every Sunday only</div></div>
+      <div class="goal-pts pts-solid">+80</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,70,'health')" data-pts="70">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">10,000 steps — 35 out of 48 days <span class="badge badge-solid">Solid</span></div><div class="goal-target">Track daily — walking pad + office + evening walk</div></div>
+      <div class="goal-pts pts-solid">+70</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,60,'health')" data-pts="60">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Gym — 32 out of 48 days <span class="badge badge-solid">Solid</span></div><div class="goal-target">Log every session — 4 sessions per week minimum</div></div>
+      <div class="goal-pts pts-solid">+60</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,50,'health')" data-pts="50">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Sleep by 10:45 PM — 40 out of 48 days <span class="badge badge-solid">Solid</span></div><div class="goal-target">Tick in journal every night you make it</div></div>
+      <div class="goal-pts pts-solid">+50</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,50,'health')" data-pts="50">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Daily self-care ritual — all 48 days <span class="badge badge-solid">Solid</span></div><div class="goal-target">Skin + hair + oral + body care as dedicated ritual</div></div>
+      <div class="goal-pts pts-solid">+50</div>
+    </div>
+    <div class="sub-label">Stretch goals</div>
+    <div class="goal-row" onclick="toggleGoal(this,50,'health')" data-pts="50">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Weight: 94 kg → 87 kg <span class="badge badge-stretch">Stretch</span></div><div class="goal-target">-7 kg — only chase if ahead of pace by week 4</div></div>
+      <div class="goal-pts pts-stretch">+50</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,40,'health')" data-pts="40">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">10,000 steps — 42 out of 48 days <span class="badge badge-stretch">Stretch</span></div><div class="goal-target">Push from 35 to 42 green days on step tracker</div></div>
+      <div class="goal-pts pts-stretch">+40</div>
+    </div>
+  </div>
+
+  <!-- SIDE HUSTLE -->
+  <div class="section-title">📚 Side Hustle — 250 pts</div>
+  <div class="pillar">
+    <div class="pillar-header">
+      <span class="pillar-title">Pillar 3 — Side Hustle</span>
+      <span class="pillar-pts" id="hustle-pts">0 / 250</span>
+    </div>
+    <div class="sub-label">Solid goals</div>
+    <div class="goal-row" onclick="toggleGoal(this,80,'hustle')" data-pts="80">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">1 book published on KDP <span class="badge badge-solid">Solid</span></div><div class="goal-target">Live on Amazon by Aug 17 — 500 words/day</div></div>
+      <div class="goal-pts pts-solid">+80</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,60,'hustle')" data-pts="60">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">1 planner designed and launched <span class="badge badge-solid">Solid</span></div><div class="goal-target">Ayurvedic wellness planner — live by Aug 3</div></div>
+      <div class="goal-pts pts-solid">+60</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,40,'hustle')" data-pts="40">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Instagram content plan complete <span class="badge badge-solid">Solid</span></div><div class="goal-target">20 captions + 10 templates + content calendar</div></div>
+      <div class="goal-pts pts-solid">+40</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,30,'hustle')" data-pts="30">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">One AI tool mastered <span class="badge badge-solid">Solid</span></div><div class="goal-target">Applied to publishing business — not just learned</div></div>
+      <div class="goal-pts pts-solid">+30</div>
+    </div>
+    <div class="sub-label">Stretch goal</div>
+    <div class="goal-row" onclick="toggleGoal(this,40,'hustle')" data-pts="40">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Root chakra book — full outline complete <span class="badge badge-stretch">Stretch</span></div><div class="goal-target">Chapter-by-chapter outline ready post-sadhana</div></div>
+      <div class="goal-pts pts-stretch">+40</div>
+    </div>
+  </div>
+
+  <!-- BROWNIE -->
+  <div class="section-title">⭐ Brownie Points — Bonus</div>
+  <div class="pillar">
+    <div class="pillar-header">
+      <span class="pillar-title">Bonus Goals</span>
+      <span class="pillar-pts" id="brownie-pts">0 / 150 bonus</span>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,80,'brownie')" data-pts="80">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Two-wheeler scooty license in hand 🛵 <span class="badge badge-brownie">Brownie</span></div><div class="goal-target">Classes from July — license by Aug 17</div></div>
+      <div class="goal-pts pts-brownie">+80</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,40,'brownie')" data-pts="40">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">Four-wheeler license begun 🚗 <span class="badge badge-brownie">Brownie</span></div><div class="goal-target">Classes started — license can extend beyond 48 days</div></div>
+      <div class="goal-pts pts-brownie">+40</div>
+    </div>
+    <div class="goal-row" onclick="toggleGoal(this,30,'brownie')" data-pts="30">
+      <div class="goal-check"><span class="goal-checkmark">✓</span></div>
+      <div class="goal-info"><div class="goal-name">48-day sadhana — zero breaks 🔱 <span class="badge badge-brownie">Brownie</span></div><div class="goal-target">Every single day completed without a gap</div></div>
+      <div class="goal-pts pts-brownie">+30</div>
+    </div>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="total-banner">
+    <div class="total-num" id="grand-total">0 / 1000</div>
+    <div class="total-lbl">+ <span id="grand-bonus" style="color:#ed93b1;">0 bonus pts</span></div>
+    <div class="total-bar"><div class="total-bar-fill" id="total-bar" style="width:0%"></div></div>
+    <div class="level-text" id="level-text">🌱 Seedling — every journey starts here</div>
+  </div>
+
+  <div class="nav">
+    <a href="index.html" class="nav-item"><span class="nav-icon">🏠</span><span class="nav-lbl">Home</span></a>
+    <a href="daily.html" class="nav-item"><span class="nav-icon">✅</span><span class="nav-lbl">Daily</span></a>
+    <a href="goals.html" class="nav-item active"><span class="nav-icon">🏆</span><span class="nav-lbl">Goals</span></a>
+    <a href="wins.html" class="nav-item"><span class="nav-icon">⭐</span><span class="nav-lbl">Wins</span></a>
+    <a href="progress.html" class="nav-item"><span class="nav-icon">📊</span><span class="nav-lbl">Progress</span></a>
+  </div>
+</div>
+
+<script>
+  const scores = { career: 0, health: 0, hustle: 0, brownie: 0 };
+  const saved = JSON.parse(localStorage.getItem('goals') || '{}');
+  document.querySelectorAll('.goal-row').forEach((r, i) => {
+    if (saved[i]) { r.classList.add('done'); const p = parseInt(r.dataset.pts); const c = r.onclick.toString().match(/'(\w+)'\)/)[1]; scores[c] += p; }
+  });
+  updateAll();
+
+  function toggleGoal(el, pts, cat) {
+    el.classList.toggle('done');
+    scores[cat] += el.classList.contains('done') ? pts : -pts;
+    const state = {};
+    document.querySelectorAll('.goal-row').forEach((r, i) => { if (r.classList.contains('done')) state[i] = true; });
+    localStorage.setItem('goals', JSON.stringify(state));
+    updateAll();
+  }
+
+  function updateAll() {
+    const main = scores.career + scores.health + scores.hustle;
+    const bonus = scores.brownie;
+    const done = document.querySelectorAll('.goal-row.done').length;
+    document.getElementById('total-score').textContent = main;
+    document.getElementById('goals-done').textContent = done;
+    document.getElementById('bonus-pts').textContent = bonus;
+    document.getElementById('career-pts').textContent = scores.career + ' / 350';
+    document.getElementById('health-pts').textContent = scores.health + ' / 400';
+    document.getElementById('hustle-pts').textContent = scores.hustle + ' / 250';
+    document.getElementById('brownie-pts').textContent = bonus + ' / 150 bonus';
+    document.getElementById('grand-total').textContent = main + ' / 1000';
+    document.getElementById('grand-bonus').textContent = bonus + ' bonus pts';
+    document.getElementById('total-bar').style.width = Math.min(100, Math.round((main/1000)*100)) + '%';
+    const levels = [[0,'🌱','Seedling'],[100,'🔥','Rising'],[250,'⚔️','Warrior'],[450,'🏗️','Builder'],[600,'✨','Shining'],[800,'🌺','Sovereign'],[1000,'🦅','Phoenix']];
+    let lvl = levels[0];
+    for (const l of levels) { if (main >= l[0]) lvl = l; }
+    document.getElementById('level-text').textContent = lvl[1] + ' ' + lvl[2] + ' — ' + ['every journey starts here','your Mars energy is awakening','Scorpio strength activated','Saturn approves your discipline','Leo in 10th awakening','Rohini Moon in full bloom','you did it Vinodhiniee'][levels.indexOf(lvl)];
+  }
+</script>
+</body>
+</html>
